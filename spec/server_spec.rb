@@ -37,8 +37,33 @@ RSpec.describe Server do
       expect { make_client }.to output("Accepted client\n").to_stdout
     end
 
-    it 'sends message when no clients exist that have not been accepted' do
-      expect { @server.accept_new_client }.to output("No Client to Accept\n").to_stdout
+    it 'sends message only once when server is waiting to accept clients' do
+      expect { @server.accept_new_client }.to output("Awaiting clients\n").to_stdout
+      @server.accept_new_client
+      expect { @server.accept_new_client }.not_to output("Awaiting clients\n").to_stdout
+    end
+  end
+
+  describe '#create_player_if_possble' do
+    it 'should update client state to named if name is provided' do
+      server_client = make_client
+      expect(@server.client_states[server_client]).to eq 'unnamed'
+      @clients.first.provide_input('Player 1')
+      @server.create_player_if_possble
+      expect(@server.client_states[server_client]).to eq 'named'
+    end
+
+    it 'should associate client to new player if client is named' do
+      make_client
+      @clients.first.provide_input('Player 1')
+      expect(@server.users.empty?).to eq true
+      @server.create_player_if_possble
+      expect(@server.users.empty?).to eq false
+    end
+  end
+
+  describe '#create_game_if_possible' do
+    it '' do
     end
   end
 end
