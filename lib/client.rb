@@ -6,6 +6,11 @@ require 'socket'
 class Client
   attr_reader :socket, :output, :name
 
+  STATES = {
+    unnamed: 'unnamed',
+    named: 'named'
+  }.freeze
+
   def initialize(port)
     @socket = TCPSocket.new('localhost', port)
   end

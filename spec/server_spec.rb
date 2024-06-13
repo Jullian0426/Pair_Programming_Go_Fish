@@ -33,7 +33,7 @@ RSpec.describe Server do
     it 'adds client to accepted_clients array and sends accepted message' do
       expect(@server.client_states.empty?).to eq true
       server_client = make_client
-      expect(@server.client_states[server_client]).to eq 'unnamed'
+      expect(@server.client_states[server_client]).to eq Client::STATES[:unnamed]
       expect { make_client }.to output("Accepted client\n").to_stdout
     end
 
@@ -47,17 +47,17 @@ RSpec.describe Server do
   describe '#create_player_if_possble' do
     it 'should update client state to named if name is provided' do
       server_client = make_client
-      expect(@server.client_states[server_client]).to eq 'unnamed'
+      expect(@server.client_states[server_client]).to eq Client::STATES[:unnamed]
       @clients.first.provide_input('Player 1')
-      @server.create_player_if_possble
-      expect(@server.client_states[server_client]).to eq 'named'
+      @server.create_player_if_possible
+      expect(@server.client_states[server_client]).to eq Client::STATES[:named]
     end
 
     it 'should associate client to new player if client is named' do
       make_client
       @clients.first.provide_input('Player 1')
       expect(@server.users.empty?).to eq true
-      @server.create_player_if_possble
+      @server.create_player_if_possible
       expect(@server.users.empty?).to eq false
     end
   end

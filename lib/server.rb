@@ -28,7 +28,7 @@ class Server
 
   def accept_new_client
     client = server.accept_nonblock
-    client_states[client] = 'unnamed'
+    client_states[client] = Client::STATES[:unnamed]
     puts 'Accepted client'
     client.puts('Enter your name: ')
     client
@@ -36,23 +36,32 @@ class Server
     await_message_handler
   end
 
-  def create_player_if_possble
+  def create_player_if_possible
     client_states.each do |client, state|
-      next unless state == 'unnamed'
+      next unless state == Client::STATES[:unnamed]
 
-      name = capture_client_input(client)
-      next if name.nil?
-
-      client.puts('Enter your name: ') if name == ''
-
-      create_player(client, name) unless name == ''
+      name = name_handler(client)
+      create_player(client, name) unless name.nil?
     end
+  end
+
+  def name_handler(client)
+    name = capture_client_input(client)
+    return name if name.nil?
+
+    return name unless name.empty?
+
+    client.puts('Invalid Input: ')
+    nil
+  end
+
+  def create_game_if_possible
   end
 
   private
 
   def create_player(client, name)
-    client_states[client] = 'named'
+    client_states[client] = Client::STATES[:named]
     users[client] = Player.new(name)
   end
 
