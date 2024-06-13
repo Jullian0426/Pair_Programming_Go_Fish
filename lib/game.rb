@@ -7,6 +7,7 @@ class Game
   attr_reader :players
 
   DECK_MULTIPLIER = 1
+  STARTING_HAND_SIZE = 5
 
   def initialize(players)
     @players = players
@@ -18,5 +19,9 @@ class Game
 
   def start
     deck.shuffle
+
+    STARTING_HAND_SIZE.times do
+      players.each { |player| player.add_to_hand(deck.deal) }
+    end
   end
 end

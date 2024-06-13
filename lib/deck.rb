@@ -21,4 +21,8 @@ class Deck
       end
     end
   end
+
+  def deal
+    cards.pop
+  end
 end
