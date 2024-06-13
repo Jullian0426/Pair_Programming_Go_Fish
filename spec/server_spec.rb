@@ -23,8 +23,23 @@ RSpec.describe Server do
     expect { Client.new(@server.port_number) }.to raise_error(Errno::ECONNREFUSED)
   end
 
+  def make_client
+    client = Client.new(@server.port_number)
+    @clients.push(client)
+    @server.accept_new_client
+    client
+  end
+
   describe '#accept_new_client' do
-    it '' do
+    it 'adds client to accepted_clients array and sends accepted message' do
+      expect(@server.accepted_clients.dup).to eq []
+      make_client
+      expect(@server.accepted_clients.size).to eq 1
+      expect { make_client }.to output("Accepted client\n").to_stdout
+    end
+
+    it 'sends message when no clients exist that have not been accepted' do
+      expect { @server.accept_new_client }.to output("No Client to Accept\n").to_stdout
     end
   end
 end
