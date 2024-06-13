@@ -27,14 +27,13 @@ RSpec.describe Server do
     client = Client.new(@server.port_number)
     @clients.push(client)
     @server.accept_new_client
-    client
   end
 
   describe '#accept_new_client' do
     it 'adds client to accepted_clients array and sends accepted message' do
-      expect(@server.accepted_clients.dup).to eq []
-      make_client
-      expect(@server.accepted_clients.size).to eq 1
+      expect(@server.client_states.empty?).to eq true
+      server_client = make_client
+      expect(@server.client_states[server_client]).to eq 'unnamed'
       expect { make_client }.to output("Accepted client\n").to_stdout
     end
 

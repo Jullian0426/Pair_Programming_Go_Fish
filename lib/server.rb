@@ -6,10 +6,10 @@ require_relative 'player'
 
 # The Server class represents a socket server for the Go Fish card game.
 class Server
-  attr_accessor :server, :accepted_clients
+  attr_accessor :server, :client_states
 
   def initialize
-    @accepted_clients = []
+    @client_states = {}
   end
 
   def port_number
@@ -26,8 +26,9 @@ class Server
 
   def accept_new_client
     client = server.accept_nonblock
-    accepted_clients << client
+    client_states[client] = 'unnamed'
     puts 'Accepted client'
+    client
   rescue IO::WaitReadable, Errno::EINTR
     puts 'No Client to Accept'
   end
