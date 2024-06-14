@@ -29,7 +29,7 @@ class Game
     end
   end
 
-  def draw_empty_hands
+  def deal_empty_hands
     players.each do |player|
       STARTING_HAND_SIZE.times { player.add_to_hand(deck.deal) } if player.hand.empty?
     end

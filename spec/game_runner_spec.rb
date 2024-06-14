@@ -41,9 +41,9 @@ RSpec.describe GameRunner do
 
   describe '#run_loop' do
     it 'should call methods necessary for one round' do
-      expect(game).to receive(:draw_empty_hands).ordered
+      expect(game).to receive(:deal_empty_hands).ordered
       expect(runner).to receive(:display_hand).ordered
-      expect(runner).to receive(:get_choices).ordered
+      expect(runner).to receive(:receive_choices).ordered
       expect(game).to receive(:play_round).ordered
       expect(runner).to receive(:display_round_result).ordered
       runner.run_loop
@@ -60,10 +60,19 @@ RSpec.describe GameRunner do
     end
   end
 
-  describe '#get_choices' do
-    it 'returns rank and opponent values provided by clients' do
-      @clients[0].provide_input('3, 2')
-      expect(runner.get_choices).to eq({ rank: '3', opponent: '2' })
+  describe '#receive_choices' do
+    before do
+      @clients[0].provide_input('3')
+      runner.receive_choices
+    end
+    it 'sets rank choice equal to client input if rank is nil' do
+      expect(runner.choices).to eq({ rank: '3', opponent: nil })
+    end
+
+    it 'sets opponent choice equal to client input if rank is set and opponent is nil' do
+      @clients[0].provide_input('2')
+      runner.receive_choices
+      expect(runner.choices).to eq({ rank: '3', opponent: '2' })
     end
   end
 
