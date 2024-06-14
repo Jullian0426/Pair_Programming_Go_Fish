@@ -30,7 +30,6 @@ RSpec.describe GameRunner do
   let(:card1) { Card.new('3', 'H') }
   let(:card2) { Card.new('6', 'C') }
 
-  # TODO: ask about testing helper methods and loops
   describe '#run' do
     it 'should start a game' do
       expect(game).to receive(:start).once
@@ -51,7 +50,7 @@ RSpec.describe GameRunner do
     end
   end
 
-  # TODO: ask if logic in the test like this is best practice
+  # TODO: refactor with regex
   describe '#display_hand' do
     it 'should send current player a display of their hand' do
       game.start
@@ -86,7 +85,7 @@ RSpec.describe GameRunner do
       runner.validate_choices
       expect(@clients[0].capture_output).to match 'Choose a rank to ask for: '
     end
-    xit 'prompts the user to input rank if both choices are nil once' do
+    xit 'prompts the user once to input rank if both choices are nil' do
       runner.validate_choices
       expect(@clients[0].capture_output).to match 'Choose a rank to ask for: '
       runner.validate_choices
@@ -98,7 +97,7 @@ RSpec.describe GameRunner do
       runner.validate_choices
       expect(runner.choices[:rank]).to be nil
     end
-    fit 'resets the choice opponent to nil if it is invalid' do
+    it 'resets the choice opponent to nil if it is invalid' do
       @clients[0].provide_input('3')
       runner.receive_choices
       @clients[0].provide_input('Larry Boy')
