@@ -44,6 +44,7 @@ RSpec.describe GameRunner do
       expect(game).to receive(:deal_empty_hands).ordered
       expect(runner).to receive(:display_hand).ordered
       expect(runner).to receive(:receive_choices).ordered
+      expect(runner).to receive(:validate_choices).ordered
       expect(game).to receive(:play_round).ordered
       expect(runner).to receive(:display_round_result).ordered
       runner.run_loop
@@ -65,6 +66,7 @@ RSpec.describe GameRunner do
       @clients[0].provide_input('3')
       runner.receive_choices
     end
+
     it 'sets rank choice equal to client input if rank is nil' do
       expect(runner.choices).to eq({ rank: '3', opponent: nil })
     end
@@ -73,6 +75,51 @@ RSpec.describe GameRunner do
       @clients[0].provide_input('2')
       runner.receive_choices
       expect(runner.choices).to eq({ rank: '3', opponent: '2' })
+    end
+  end
+
+  describe '#validate_choices' do
+    before do
+      game.current_player.add_to_hand(card1)
+    end
+    it 'prompts the user to input rank if both choices are nil' do
+      runner.validate_choices
+      expect(@clients[0].capture_output).to match 'Choose a rank to ask for: '
+    end
+    xit 'prompts the user to input rank if both choices are nil once' do
+      runner.validate_choices
+      expect(@clients[0].capture_output).to match 'Choose a rank to ask for: '
+      runner.validate_choices
+      expect(@clients[0].capture_output).not_to match 'Choose a rank to ask for: '
+    end
+    it 'resets the choice rank to nil if it is invalid' do
+      @clients[0].provide_input('4')
+      runner.receive_choices
+      runner.validate_choices
+      expect(runner.choices[:rank]).to be nil
+    end
+    fit 'resets the choice opponent to nil if it is invalid' do
+      @clients[0].provide_input('3')
+      runner.receive_choices
+      @clients[0].provide_input('Larry Boy')
+      runner.receive_choices
+      runner.validate_choices
+      expect(runner.choices[:opponent]).to be nil
+    end
+    it 'sets the choice rank if input is valid' do
+      @clients[0].provide_input('3')
+      runner.receive_choices
+      runner.validate_choices
+      expect(runner.choices[:rank]).to eql '3'
+    end
+    it 'sets the choice opponent if input is valid' do
+      @clients[0].provide_input('3')
+      runner.receive_choices
+      @clients[0].provide_input('1')
+      runner.receive_choices
+      runner.validate_choices
+      expect(runner.choices[:rank]).to eq '3'
+      expect(runner.choices[:opponent]).to eq '1'
     end
   end
 

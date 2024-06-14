@@ -3,12 +3,13 @@
 # The GameRunner class is responsible for running the game of Go Fish.
 class GameRunner
   attr_reader :game, :clients
-  attr_accessor :choices
+  attr_accessor :choices, :current_client
 
   def initialize(game, clients)
     @game = game
     @clients = clients
     @choices = { rank: nil, opponent: nil }
+    @current_client = find_client_for_player(game.current_player)
   end
 
   def run
@@ -20,23 +21,34 @@ class GameRunner
     game.deal_empty_hands
     display_hand
     receive_choices
+    validate_choices
     game.play_round
     display_round_result
   end
 
   def display_hand
     card_list = game.current_player.hand.map { |card| "#{card.rank}#{card.suit}" }.join(', ').to_s
-    client = find_client_for_player(game.current_player)
-    client.puts("Your hand: #{card_list}")
+    current_client.puts("Your hand: #{card_list}")
   end
 
   def receive_choices
-    client = find_client_for_player(game.current_player)
-    input = capture_client_input(client)
-    if @choices[:rank].nil?
-      @choices[:rank] = input
-    elsif @choices[:opponent].nil?
-      @choices[:opponent] = input
+    input = capture_client_input(current_client)
+    if choices[:rank].nil?
+      choices[:rank] = input
+    elsif choices[:opponent].nil?
+      choices[:opponent] = input
+    end
+    nil
+  end
+
+  def validate_choices
+    return current_client.puts('Choose a rank to ask for: ') if choices[:rank].nil?
+
+    player_has_rank = game.current_player.hand_has_rank?(choices[:rank])
+    if !player_has_rank
+      choices[:rank] = nil
+    elsif choices[:opponent].to_i <= 0 || !game.players[choices[:opponent].to_i - 1]
+      choices[:opponent] = nil
     end
   end
 
@@ -54,6 +66,6 @@ class GameRunner
     sleep(0.1)
     client.read_nonblock(1000).chomp.upcase
   rescue IO::WaitReadable
-    @output = ''
+    nil
   end
 end

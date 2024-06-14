@@ -4,6 +4,7 @@ require 'socket'
 require_relative 'game'
 require_relative 'player'
 require_relative 'game_runner'
+require_relative 'client'
 
 # The Server class represents a socket server for the Go Fish card game.
 class Server
