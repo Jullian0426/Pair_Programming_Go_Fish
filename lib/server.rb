@@ -60,11 +60,14 @@ class Server
   def create_game_if_possible
     return if users.size < Game::MIN_PLAYERS
 
-    games << Game.new(users.values)
+    game = Game.new(users.values)
+    games << game
+    game
   end
 
   def run_game(game)
-    runner = GameRunner.new(game)
+    clients = game.players.map { |player| users.key(player) }
+    runner = GameRunner.new(game, clients)
     runner.run
   end
 
