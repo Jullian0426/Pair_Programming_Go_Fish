@@ -38,4 +38,16 @@ RSpec.describe Game do
       expect(player2.hand.size).to eq Game::STARTING_HAND_SIZE
     end
   end
+
+  describe '#draw_empty_hands' do
+    it 'should distribute cards from deck to players with empty hands' do
+      game.start
+      starting_deck_size = game.deck.cards.size.dup
+      player1.hand = []
+      game.draw_empty_hands
+      expect(player1.hand.size).to eq Game::STARTING_HAND_SIZE
+      expect(player2.hand.size).to eq Game::STARTING_HAND_SIZE
+      expect(game.deck.cards.size).to eq starting_deck_size - Game::STARTING_HAND_SIZE
+    end
+  end
 end
