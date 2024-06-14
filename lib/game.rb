@@ -8,6 +8,7 @@ class Game
 
   DECK_MULTIPLIER = 1
   STARTING_HAND_SIZE = 5
+  MIN_PLAYERS = 2
 
   def initialize(players)
     @players = players

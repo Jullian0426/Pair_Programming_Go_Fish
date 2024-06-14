@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'socket'
 require_relative '../lib/server'
 require_relative '../lib/client'
+require_relative '../lib/game_runner'
 
 RSpec.describe Server do
   before(:each) do
@@ -27,6 +28,12 @@ RSpec.describe Server do
     client = Client.new(@server.port_number)
     @clients.push(client)
     @server.accept_new_client
+  end
+
+  def make_client_and_player(index)
+    make_client
+    @clients[index].provide_input("Player #{index + 1}")
+    @server.create_player_if_possible
   end
 
   describe '#accept_new_client' do
@@ -63,7 +70,18 @@ RSpec.describe Server do
   end
 
   describe '#create_game_if_possible' do
-    it '' do
+    it 'should not create a game if there are not enough players' do
+      expect(@server.games).to be_empty
+      @server.create_game_if_possible
+      expect(@server.games).to be_empty
+    end
+
+    it 'should create a game if there are enough players' do
+      make_client_and_player(0)
+      make_client_and_player(1)
+      expect(@server.games).to be_empty
+      @server.create_game_if_possible
+      expect(@server.games.first).to respond_to(:players)
     end
   end
 end

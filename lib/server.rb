@@ -3,15 +3,17 @@
 require 'socket'
 require_relative 'game'
 require_relative 'player'
+require_relative 'game_runner'
 
 # The Server class represents a socket server for the Go Fish card game.
 class Server
-  attr_accessor :server, :client_states, :awaiting_state, :users
+  attr_accessor :server, :client_states, :awaiting_state, :users, :games
 
   def initialize
     @client_states = {}
     @awaiting_state = true
     @users = {}
+    @games = []
   end
 
   def port_number
@@ -56,6 +58,14 @@ class Server
   end
 
   def create_game_if_possible
+    return if users.size < Game::MIN_PLAYERS
+
+    games << Game.new(users.values)
+  end
+
+  def run_game(game)
+    runner = GameRunner.new(game)
+    runner.run
   end
 
   private
