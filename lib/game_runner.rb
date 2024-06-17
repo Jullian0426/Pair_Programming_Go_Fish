@@ -3,13 +3,14 @@
 # The GameRunner class is responsible for running the game of Go Fish.
 class GameRunner
   attr_reader :game, :clients
-  attr_accessor :choices, :current_client
+  attr_accessor :choices, :current_client, :prompts
 
   def initialize(game, clients)
     @game = game
     @clients = clients
     @choices = { rank: nil, opponent: nil }
     @current_client = find_client_for_player(game.current_player)
+    @prompts = { rank: false, opponent: false }
   end
 
   def run
@@ -42,14 +43,26 @@ class GameRunner
   end
 
   def validate_choices
-    return current_client.puts('Choose a rank to ask for: ') if choices[:rank].nil?
+    prompt(:rank, 'Choose a rank to ask for: ')
+    prompt(:opponent, 'Choose an opponent to ask: ')
 
+    update_choices
+  end
+
+  def update_choices
     player_has_rank = game.current_player.hand_has_rank?(choices[:rank])
     if !player_has_rank
       choices[:rank] = nil
     elsif choices[:opponent].to_i <= 0 || !game.players[choices[:opponent].to_i - 1]
       choices[:opponent] = nil
     end
+  end
+
+  def prompt(value, message)
+    return unless choices[value].nil? && !prompts[value]
+
+    current_client.puts(message)
+    prompts[value] = true
   end
 
   def display_round_result

@@ -50,13 +50,11 @@ RSpec.describe GameRunner do
     end
   end
 
-  # TODO: refactor with regex
   describe '#display_hand' do
     it 'should send current player a display of their hand' do
       game.start
       runner.display_hand
-      card_list = game.current_player.hand.map { |card| "#{card.rank}#{card.suit}" }.join(', ').to_s
-      expect(@clients.first.capture_output).to include("Your hand: #{card_list}")
+      expect(@clients.first.capture_output).to match(/Your hand: (\d+[HCDS],\s)*\d+[HCDS]/)
     end
   end
 
@@ -83,13 +81,13 @@ RSpec.describe GameRunner do
     end
     it 'prompts the user to input rank if both choices are nil' do
       runner.validate_choices
-      expect(@clients[0].capture_output).to match 'Choose a rank to ask for: '
+      expect(@clients[0].capture_output).to include('Choose a rank to ask for: ')
     end
-    xit 'prompts the user once to input rank if both choices are nil' do
+    it 'prompts the user once to input rank if both choices are nil' do
       runner.validate_choices
-      expect(@clients[0].capture_output).to match 'Choose a rank to ask for: '
+      expect(@clients[0].capture_output).to include('Choose a rank to ask for: ')
       runner.validate_choices
-      expect(@clients[0].capture_output).not_to match 'Choose a rank to ask for: '
+      expect(@clients[0].capture_output).not_to include('Choose a rank to ask for: ')
     end
     it 'resets the choice rank to nil if it is invalid' do
       @clients[0].provide_input('4')
